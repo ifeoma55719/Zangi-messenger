@@ -1,0 +1,3105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zangi Messenger</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <style>
+        /* CSS Variables for Theming */
+:root {
+    --primary-color: #00c853;
+    --primary-dark: #009624;
+    --primary-light: #69f0ae;
+    --secondary-color: #2979ff;
+    --danger-color: #ff1744;
+    --warning-color: #ff9100;
+    
+    /* Light Theme */
+    --bg-primary: #f5f5f5;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #eeeeee;
+    --text-primary: #212121;
+    --text-secondary: #757575;
+    --text-tertiary: #9e9e9e;
+    --border-color: #e0e0e0;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --message-bg-me: #dcf8c6;
+    --message-bg-other: #ffffff;
+    --online-color: #00c853;
+    --input-bg: #ffffff;
+    --sidebar-bg: #ffffff;
+    --chat-bg: #e5ddd5;
+}
+
+[data-theme="dark"] {
+    --bg-primary: #121212;
+    --bg-secondary: #1e1e1e;
+    --bg-tertiary: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --text-tertiary: #808080;
+    --border-color: #333333;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --message-bg-me: #005c4b;
+    --message-bg-other: #2d2d2d;
+    --online-color: #00c853;
+    --input-bg: #2d2d2d;
+    --sidebar-bg: #1e1e1e;
+    --chat-bg: #0f1419;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    overflow: hidden;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Authentication Styles */
+.auth-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-container::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: backgroundMove 20s linear infinite;
+}
+
+@keyframes backgroundMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+.auth-box {
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    padding: 40px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 20px 60px var(--shadow-color);
+    position: relative;
+    z-index: 1;
+}
+
+.logo-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    font-size: 40px;
+    color: white;
+    box-shadow: 0 10px 30px rgba(0, 200, 83, 0.3);
+}
+
+.logo-section h1 {
+    font-size: 28px;
+    margin-bottom: 5px;
+    color: var(--text-primary);
+}
+
+.logo-section p {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.form-section {
+    display: none;
+}
+
+.form-section.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-section h2 {
+    margin-bottom: 25px;
+    color: var(--text-primary);
+    font-size: 24px;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-group i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-tertiary);
+    font-size: 18px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 15px 15px 15px 45px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.input-group input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.1);
+}
+
+.input-group .toggle-password {
+    left: auto;
+    right: 15px;
+    cursor: pointer;
+}
+
+.input-group input[type="file"] {
+    display: none;
+}
+
+.file-label {
+    display: block;
+    padding: 15px;
+    background: var(--bg-tertiary);
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.3s;
+}
+
+.file-label:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.avatar-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 10px auto;
+    border: 3px solid var(--primary-color);
+    display: none;
+}
+
+.avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-preview.show {
+    display: block;
+}
+
+/* Biometric Buttons */
+.biometric-options, .biometric-setup {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.biometric-setup {
+    flex-direction: column;
+    background: var(--bg-tertiary);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.biometric-setup h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: var(--text-secondary);
+}
+
+.bio-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--bg-secondary);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.bio-btn:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.bio-btn i {
+    font-size: 32px;
+    color: var(--primary-color);
+}
+
+.bio-btn span {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.bio-btn.success {
+    border-color: var(--primary-color);
+    background: rgba(0, 200, 83, 0.1);
+}
+
+.bio-btn.error {
+    border-color: var(--danger-color);
+    background: rgba(255, 23, 68, 0.1);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 200, 83, 0.3);
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 200, 83, 0.4);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+.switch-text {
+    text-align: center;
+    margin-top: 20px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.switch-text a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* Modals */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.modal.show {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 90%;
+    width: 400px;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.close-modal:hover {
+    background: var(--bg-tertiary);
+    color: var(--danger-color);
+}
+
+/* Face ID Modal */
+.faceid-content {
+    width: 350px;
+    text-align: center;
+}
+
+.faceid-container {
+    padding: 20px 0;
+}
+
+.faceid-frame {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid var(--primary-color);
+}
+
+#faceid-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+}
+
+#faceid-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: scaleX(-1);
+}
+
+.faceid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.scan-line {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--primary-color), transparent);
+    top: 0;
+    animation: scan 2s linear infinite;
+    box-shadow: 0 0 10px var(--primary-color);
+}
+
+@keyframes scan {
+    0% { top: 0; }
+    100% { top: 100%; }
+}
+
+.faceid-corner {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border: 3px solid var(--primary-color);
+}
+
+.faceid-corner.top-left {
+    top: 10px;
+    left: 10px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.faceid-corner.top-right {
+    top: 10px;
+    right: 10px;
+    border-left: none;
+    border-bottom: none;
+}
+
+.faceid-corner.bottom-left {
+    bottom: 10px;
+    left: 10px;
+    border-right: none;
+    border-top: none;
+}
+
+.faceid-corner.bottom-right {
+    bottom: 10px;
+    right: 10px;
+    border-left: none;
+    border-top: none;
+}
+
+.faceid-status {
+    margin-top: 20px;
+}
+
+.scanning-text {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+}
+
+.scanning-progress {
+    width: 100%;
+    height: 4px;
+    background: var(--bg-tertiary);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    transition: width 0.1s linear;
+}
+
+.scanning-timer {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+/* Fingerprint Modal */
+.fingerprint-content {
+    text-align: center;
+}
+
+.fingerprint-container {
+    padding: 40px 20px;
+}
+
+.fingerprint-icon {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fingerprint-icon i {
+    font-size: 80px;
+    color: var(--primary-color);
+    z-index: 2;
+}
+
+.fingerprint-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: pulse 1.5s ease-out infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+.fingerprint-status {
+    font-size: 18px;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+}
+
+.fingerprint-hint {
+    font-size: 14px;
+    color: var(--text-secondary);
+    min-height: 20px;
+}
+
+/* Main App Layout */
+.app-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    background: var(--bg-primary);
+}
+
+/* Sidebar */
+.sidebar {
+    width: 35%;
+    max-width: 400px;
+    min-width: 300px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 20px;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.user-profile img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary-color);
+}
+
+.user-info h3 {
+    font-size: 16px;
+    margin-bottom: 3px;
+}
+
+.user-info span {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    font-size: 16px;
+}
+
+.icon-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+.search-box {
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+}
+
+.search-box i {
+    position: absolute;
+    left: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-tertiary);
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border: none;
+    border-radius: 20px;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    outline: none;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    background: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s;
+    border-bottom: 3px solid transparent;
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    background: rgba(0, 200, 83, 0.1);
+}
+
+.tab-btn:hover {
+    color: var(--primary-color);
+}
+
+.contacts-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 0;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.contact-item:hover {
+    background: var(--bg-tertiary);
+}
+
+.contact-item.active {
+    background: rgba(0, 200, 83, 0.1);
+    border-left: 3px solid var(--primary-color);
+}
+
+.contact-avatar {
+    position: relative;
+    margin-right: 15px;
+}
+
+.contact-avatar img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.online-indicator {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background: var(--online-color);
+    border-radius: 50%;
+    border: 2px solid var(--bg-secondary);
+}
+
+.contact-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.contact-name {
+    font-weight: 600;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.contact-last-message {
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.contact-meta {
+    text-align: right;
+    margin-left: 10px;
+}
+
+.contact-time {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-bottom: 5px;
+}
+
+.unread-badge {
+    background: var(--primary-color);
+    color: white;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+/* Chat Area */
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--chat-bg);
+    position: relative;
+}
+
+.chat-header {
+    padding: 15px 20px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.chat-user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.chat-user-info img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.chat-user-details h3 {
+    font-size: 16px;
+    margin-bottom: 3px;
+}
+
+.chat-user-details span {
+    font-size: 13px;
+    color: var(--online-color);
+}
+
+.chat-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+}
+
+.empty-state i {
+    font-size: 64px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.message {
+    max-width: 70%;
+    padding: 12px 15px;
+    border-radius: 15px;
+    position: relative;
+    animation: messageSlide 0.3s ease;
+}
+
+@keyframes messageSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message.sent {
+    align-self: flex-end;
+    background: var(--message-bg-me);
+    color: var(--text-primary);
+    border-bottom-right-radius: 5px;
+}
+
+.message.received {
+    align-self: flex-start;
+    background: var(--message-bg-other);
+    color: var(--text-primary);
+    border-bottom-left-radius: 5px;
+    box-shadow: 0 1px 2px var(--shadow-color);
+}
+
+.message-content {
+    margin-bottom: 5px;
+    word-wrap: break-word;
+}
+
+.message-image {
+    max-width: 100%;
+    border-radius: 10px;
+    margin-bottom: 5px;
+}
+
+.message-time {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    text-align: right;
+}
+
+.message-status {
+    margin-left: 5px;
+    font-size: 12px;
+}
+
+.message-status.sent { color: var(--text-tertiary); }
+.message-status.delivered { color: var(--text-tertiary); }
+.message-status.read { color: var(--secondary-color); }
+
+.input-area {
+    padding: 15px 20px;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.message-input-container {
+    flex: 1;
+    position: relative;
+}
+
+#message-input {
+    width: 100%;
+    padding: 15px 45px 15px 20px;
+    border: none;
+    border-radius: 25px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    outline: none;
+    font-size: 15px;
+}
+
+.emoji-btn {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+}
+
+.send-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: all 0.3s;
+}
+
+.send-btn:hover {
+    background: var(--primary-dark);
+    transform: scale(1.1);
+}
+
+/* Attachment Menu */
+.attachment-menu {
+    position: absolute;
+    bottom: 80px;
+    left: 20px;
+    background: var(--bg-secondary);
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 5px 20px var(--shadow-color);
+    display: flex;
+    gap: 15px;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.attachment-menu button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 15px;
+    border: none;
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.3s;
+    min-width: 70px;
+}
+
+.attachment-menu button:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: scale(1.05);
+}
+
+.attachment-menu button i {
+    font-size: 24px;
+}
+
+.attachment-menu button span {
+    font-size: 12px;
+}
+
+/* Status Modal */
+.status-content {
+    width: 90%;
+    max-width: 500px;
+}
+
+.status-content h2 {
+    margin-bottom: 20px;
+    color: var(--text-primary);
+}
+
+.status-input textarea {
+    width: 100%;
+    height: 100px;
+    padding: 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    resize: none;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.status-media button {
+    width: 100%;
+    padding: 15px;
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.status-media button:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+#status-preview {
+    margin-top: 15px;
+    border-radius: 12px;
+    overflow: hidden;
+    max-height: 200px;
+}
+
+#status-preview img, #status-preview video {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.modal-actions button {
+    flex: 1;
+    padding: 15px;
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.secondary-btn {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.secondary-btn:hover {
+    background: var(--border-color);
+}
+
+.primary-btn {
+    background: var(--primary-color);
+    color: white;
+}
+
+.primary-btn:hover {
+    background: var(--primary-dark);
+}
+
+/* Call Modal */
+.call-content {
+    text-align: center;
+    padding: 40px;
+}
+
+.call-info img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    animation: pulse 2s infinite;
+}
+
+.call-info h2 {
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.call-info p {
+    color: var(--text-secondary);
+    margin-bottom: 40px;
+}
+
+.call-actions {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+}
+
+.call-btn {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-size: 30px;
+    color: white;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.call-btn.end {
+    background: var(--danger-color);
+}
+
+.call-btn.accept {
+    background: var(--primary-color);
+    animation: pulse 1s infinite;
+}
+
+.call-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Toast Notifications */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    padding: 15px 20px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-radius: 12px;
+    box-shadow: 0 5px 20px var(--shadow-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: toastSlide 0.3s ease;
+    min-width: 300px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.toast.error {
+    border-left-color: var(--danger-color);
+}
+
+.toast.warning {
+    border-left-color: var(--warning-color);
+}
+
+@keyframes toastSlide {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.toast i {
+    font-size: 20px;
+    color: var(--primary-color);
+}
+
+.toast.error i {
+    color: var(--danger-color);
+}
+
+/* Status View */
+.status-view {
+    padding: 20px;
+}
+
+.status-item {
+    background: var(--bg-secondary);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 10px var(--shadow-color);
+}
+
+.status-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.status-header img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.status-header-info h4 {
+    margin-bottom: 3px;
+}
+
+.status-header-info span {
+    font-size: 13px;
+    color: var(--text-tertiary);
+}
+
+.status-text {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.status-media-content {
+    border-radius: 10px;
+    overflow: hidden;
+    max-height: 300px;
+}
+
+.status-media-content img, .status-media-content video {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        max-width: none;
+        position: absolute;
+        z-index: 10;
+        transform: translateX(0);
+        transition: transform 0.3s;
+    }
+    
+    .sidebar.hidden {
+        transform: translateX(-100%);
+    }
+    
+    .chat-area {
+        width: 100%;
+    }
+    
+    .auth-box {
+        padding: 30px 20px;
+    }
+    
+    .biometric-options {
+        flex-direction: column;
+    }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--text-tertiary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* Typing Indicator */
+.typing-indicator {
+    display: flex;
+    gap: 5px;
+    padding: 15px;
+    background: var(--message-bg-other);
+    border-radius: 15px;
+    align-self: flex-start;
+    margin-bottom: 10px;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background: var(--text-tertiary);
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+}
+
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-10px); }
+}
+
+/* Call Screen */
+.call-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-primary);
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+}
+
+.call-screen video {
+    flex: 1;
+    width: 100%;
+    object-fit: cover;
+    background: #000;
+}
+
+.call-controls {
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+}
+
+.call-control-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s;
+    backdrop-filter: blur(10px);
+}
+
+.call-control-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.1);
+}
+
+.call-control-btn.end {
+    background: var(--danger-color);
+}
+
+    </style>
+    <!-- Authentication Container -->
+    <div id="auth-container" class="auth-container">
+        <div class="auth-box">
+            <div class="logo-section">
+                <div class="logo">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h1>Zangi Messenger</h1>
+                <p>Secure. Fast. Private.</p>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form" class="form-section active">
+                <h2>Welcome Back</h2>
+                <form id="login-form-element">
+                    <div class="input-group">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" id="login-phone" placeholder="Phone Number" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="login-password" placeholder="Password" required>
+                        <i class="fas fa-eye toggle-password" onclick="togglePassword('login-password')"></i>
+                    </div>
+                    
+                    <!-- Biometric Options -->
+                    <div class="biometric-options">
+                        <button type="button" class="bio-btn face-id-btn" onclick="startFaceID('login')">
+                            <i class="fas fa-face-viewfinder"></i>
+                            <span>Face ID</span>
+                        </button>
+                        <button type="button" class="bio-btn fingerprint-btn" onclick="checkFingerprint('login')">
+                            <i class="fas fa-fingerprint"></i>
+                            <span>Fingerprint</span>
+                        </button>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Login</button>
+                    <p class="switch-text">Don't have an account? <a href="#" onclick="showSignup()">Sign Up</a></p>
+                </form>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signup-form" class="form-section">
+                <h2>Create Account</h2>
+                <form id="signup-form-element">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="signup-name" placeholder="Full Name" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" id="signup-phone" placeholder="Phone Number" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="signup-password" placeholder="Password" required>
+                        <i class="fas fa-eye toggle-password" onclick="togglePassword('signup-password')"></i>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-image"></i>
+                        <input type="file" id="signup-avatar" accept="image/*" onchange="previewAvatar(this)">
+                        <label for="signup-avatar" class="file-label">Choose Profile Picture</label>
+                    </div>
+                    <div class="avatar-preview" id="avatar-preview"></div>
+
+                    <!-- Biometric Setup -->
+                    <div class="biometric-setup">
+                        <h3>Set Up Biometric Login</h3>
+                        <button type="button" class="bio-btn face-id-btn" onclick="startFaceID('setup')">
+                            <i class="fas fa-face-viewfinder"></i>
+                            <span>Setup Face ID</span>
+                        </button>
+                        <button type="button" class="bio-btn fingerprint-btn" onclick="checkFingerprint('setup')">
+                            <i class="fas fa-fingerprint"></i>
+                            <span>Setup Fingerprint</span>
+                        </button>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Create Account</button>
+                    <p class="switch-text">Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Face ID Modal -->
+    <div id="faceid-modal" class="modal">
+        <div class="modal-content faceid-content">
+            <div class="faceid-container">
+                <div class="faceid-frame">
+                    <video id="faceid-video" autoplay playsinline></video>
+                    <canvas id="faceid-canvas"></canvas>
+                    <div class="faceid-overlay">
+                        <div class="scan-line"></div>
+                        <div class="faceid-corner top-left"></div>
+                        <div class="faceid-corner top-right"></div>
+                        <div class="faceid-corner bottom-left"></div>
+                        <div class="faceid-corner bottom-right"></div>
+                    </div>
+                </div>
+                <div class="faceid-status">
+                    <div class="scanning-text">Position your face in the frame</div>
+                    <div class="scanning-progress">
+                        <div class="progress-bar"></div>
+                    </div>
+                    <div class="scanning-timer">10s</div>
+                </div>
+            </div>
+            <button class="close-modal" onclick="closeFaceID()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Fingerprint Modal -->
+    <div id="fingerprint-modal" class="modal">
+        <div class="modal-content fingerprint-content">
+            <div class="fingerprint-container">
+                <div class="fingerprint-icon">
+                    <i class="fas fa-fingerprint"></i>
+                    <div class="fingerprint-ring"></div>
+                </div>
+                <div class="fingerprint-status">Touch your fingerprint sensor</div>
+                <div class="fingerprint-hint" id="fingerprint-hint"></div>
+            </div>
+            <button class="close-modal" onclick="closeFingerprint()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app-container" class="app-container hidden">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <img id="user-avatar" src="" alt="Profile">
+                    <div class="user-info">
+                        <h3 id="user-name"></h3>
+                        <span id="user-phone"></span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" onclick="toggleTheme()">
+                        <i class="fas fa-moon" id="theme-icon"></i>
+                    </button>
+                    <button class="icon-btn" onclick="showStatusModal()">
+                        <i class="fas fa-circle-notch"></i>
+                    </button>
+                    <button class="icon-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-users" placeholder="Search contacts..." onkeyup="searchUsers()">
+            </div>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('chats')">
+                    <i class="fas fa-comment"></i> Chats
+                </button>
+                <button class="tab-btn" onclick="switchTab('status')">
+                    <i class="fas fa-circle-notch"></i> Status
+                </button>
+                <button class="tab-btn" onclick="switchTab('calls')">
+                    <i class="fas fa-phone"></i> Calls
+                </button>
+            </div>
+
+            <div class="contacts-list" id="contacts-list">
+                <!-- Contacts populated by JS -->
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area" id="chat-area">
+            <div class="chat-header" id="chat-header">
+                <div class="chat-user-info">
+                    <img id="chat-avatar" src="" alt="">
+                    <div class="chat-user-details">
+                        <h3 id="chat-name">Select a chat</h3>
+                        <span id="chat-status">Online</span>
+                    </div>
+                </div>
+                <div class="chat-actions">
+                    <button class="icon-btn" onclick="startVoiceCall()">
+                        <i class="fas fa-phone"></i>
+                    </button>
+                    <button class="icon-btn" onclick="startVideoCall()">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="icon-btn" onclick="showChatMenu()">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="messages-container" id="messages-container">
+                <div class="empty-state">
+                    <i class="fas fa-comments"></i>
+                    <p>Select a contact to start messaging</p>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <button class="icon-btn" onclick="showAttachmentMenu()">
+                    <i class="fas fa-paperclip"></i>
+                </button>
+                <div class="message-input-container">
+                    <input type="text" id="message-input" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+                    <button class="icon-btn emoji-btn" onclick="showEmojiPicker()">
+                        <i class="fas fa-smile"></i>
+                    </button>
+                </div>
+                <button class="send-btn" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+
+            <!-- Attachment Menu -->
+            <div id="attachment-menu" class="attachment-menu hidden">
+                <button onclick="selectImage()">
+                    <i class="fas fa-image"></i>
+                    <span>Image</span>
+                </button>
+                <button onclick="selectFile()">
+                    <i class="fas fa-file"></i>
+                    <span>Document</span>
+                </button>
+                <button onclick="selectCamera()">
+                    <i class="fas fa-camera"></i>
+                    <span>Camera</span>
+                </button>
+                <button onclick="selectLocation()">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Location</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Modal -->
+    <div id="status-modal" class="modal">
+        <div class="modal-content status-content">
+            <h2>My Status</h2>
+            <div class="status-input">
+                <textarea id="status-text" placeholder="What's on your mind?"></textarea>
+                <div class="status-media">
+                    <input type="file" id="status-media-input" accept="image/*,video/*" hidden>
+                    <button onclick="document.getElementById('status-media-input').click()">
+                        <i class="fas fa-camera"></i> Add Photo/Video
+                    </button>
+                </div>
+                <div id="status-preview"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="secondary-btn" onclick="closeStatusModal()">Cancel</button>
+                <button class="primary-btn" onclick="postStatus()">Post Status</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call Modal -->
+    <div id="call-modal" class="modal">
+        <div class="modal-content call-content">
+            <div class="call-info">
+                <img id="call-avatar" src="" alt="">
+                <h2 id="call-name">Calling...</h2>
+                <p id="call-status">Connecting...</p>
+            </div>
+            <div class="call-actions">
+                <button class="call-btn end" onclick="endCall()">
+                    <i class="fas fa-phone-slash"></i>
+                </button>
+                <button class="call-btn accept hidden" onclick="acceptCall()">
+                    <i class="fas fa-phone"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script>
+        // Zangi Messenger - Main Application JavaScript
+// ================================================
+
+// Global State
+let currentUser = null;
+let currentChat = null;
+let users = JSON.parse(localStorage.getItem('zangi_users')) || [];
+let messages = JSON.parse(localStorage.getItem('zangi_messages')) || {};
+let statuses = JSON.parse(localStorage.getItem('zangi_statuses')) || [];
+let theme = localStorage.getItem('zangi_theme') || 'light';
+let faceIDStream = null;
+let scanningInterval = null;
+let callTimer = null;
+
+// Initialize Application
+document.addEventListener('DOMContentLoaded', () => {
+    initializeTheme();
+    checkExistingSession();
+    setupEventListeners();
+    generateDummyUsers();
+});
+
+// Theme Management
+function initializeTheme() {
+    document.documentElement.setAttribute('data-theme', theme);
+    updateThemeIcon();
+}
+
+function toggleTheme() {
+    theme = theme === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('zangi_theme', theme);
+    updateThemeIcon();
+    showToast(`Switched to ${theme} mode`, 'info');
+}
+
+function updateThemeIcon() {
+    const icon = document.getElementById('theme-icon');
+    if (icon) {
+        icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+    }
+}
+
+// Session Management
+function checkExistingSession() {
+    const savedUser = localStorage.getItem('zangi_current_user');
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        showMainApp();
+    }
+}
+
+function setupEventListeners() {
+    // Login form
+    const loginForm = document.getElementById('login-form-element');
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLogin);
+    }
+
+    // Signup form
+    const signupForm = document.getElementById('signup-form-element');
+    if (signupForm) {
+        signupForm.addEventListener('submit', handleSignup);
+    }
+
+    // Status media input
+    const statusMediaInput = document.getElementById('status-media-input');
+    if (statusMediaInput) {
+        statusMediaInput.addEventListener('change', previewStatusMedia);
+    }
+}
+
+// Navigation Functions
+function showSignup() {
+    document.getElementById('login-form').classList.remove('active');
+    document.getElementById('signup-form').classList.add('active');
+}
+
+function showLogin() {
+    document.getElementById('signup-form').classList.remove('active');
+    document.getElementById('login-form').classList.add('active');
+}
+
+function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    const icon = input.nextElementSibling;
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+// Avatar Preview
+function previewAvatar(input) {
+    const preview = document.getElementById('avatar-preview');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            preview.classList.add('show');
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// ==========================================
+// FACE ID IMPLEMENTATION
+// ==========================================
+
+async function startFaceID(mode) {
+    const modal = document.getElementById('faceid-modal');
+    const video = document.getElementById('faceid-video');
+    const canvas = document.getElementById('faceid-canvas');
+    const progressBar = document.querySelector('.progress-bar');
+    const timerDisplay = document.querySelector('.scanning-timer');
+    const statusText = document.querySelector('.scanning-text');
+
+    modal.classList.add('show');
+    
+    try {
+        // Check for camera support
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error('Camera not supported on this device');
+        }
+
+        // Get camera stream
+        faceIDStream = await navigator.mediaDevices.getUserMedia({ 
+            video: { 
+                facingMode: 'user',
+                width: { ideal: 640 },
+                height: { ideal: 480 }
+            } 
+        });
+        
+        video.srcObject = faceIDStream;
+        
+        // Wait for video to play
+        await new Promise(resolve => {
+            video.onloadedmetadata = () => {
+                video.play();
+                resolve();
+            };
+        });
+
+        // Start scanning animation
+        let progress = 0;
+        let timeLeft = 10;
+        
+        statusText.textContent = 'Scanning your face...';
+        
+        scanningInterval = setInterval(() => {
+            progress += 1;
+            timeLeft = Math.max(0, 10 - Math.floor(progress / 10));
+            
+            progressBar.style.width = `${progress}%`;
+            timerDisplay.textContent = `${timeLeft}s`;
+            
+            // Draw face detection overlay
+            drawFaceOverlay(canvas, video);
+            
+            if (progress >= 100) {
+                clearInterval(scanningInterval);
+                completeFaceID(mode);
+            }
+        }, 100);
+
+    } catch (error) {
+        console.error('Face ID error:', error);
+        statusText.textContent = 'Camera access denied or not available';
+        showToast('Face ID requires camera access', 'error');
+        setTimeout(closeFaceID, 2000);
+    }
+}
+
+function drawFaceOverlay(canvas, video) {
+    const ctx = canvas.getContext('2d');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw face detection points (simulated)
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = Math.min(canvas.width, canvas.height) * 0.35;
+    
+    // Draw detection circle
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    ctx.strokeStyle = '#00c853';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    
+    // Draw detection points
+    const points = 8;
+    for (let i = 0; i < points; i++) {
+        const angle = (i / points) * 2 * Math.PI;
+        const x = centerX + Math.cos(angle) * radius;
+        const y = centerY + Math.sin(angle) * radius;
+        
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = '#00c853';
+        ctx.fill();
+    }
+    
+    // Draw center crosshair
+    ctx.beginPath();
+    ctx.moveTo(centerX - 20, centerY);
+    ctx.lineTo(centerX + 20, centerY);
+    ctx.moveTo(centerX, centerY - 20);
+    ctx.lineTo(centerX, centerY + 20);
+    ctx.strokeStyle = '#00c853';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+}
+
+function completeFaceID(mode) {
+    const statusText = document.querySelector('.scanning-text');
+    statusText.textContent = 'Face recognized successfully!';
+    statusText.style.color = '#00c853';
+    
+    showToast('Face ID verified successfully', 'success');
+    
+    // Update button state
+    if (mode === 'setup') {
+        const btn = document.querySelector('.biometric-setup .face-id-btn');
+        btn.classList.add('success');
+        btn.innerHTML = '<i class="fas fa-check-circle"></i><span>Face ID Set</span>';
+    }
+    
+    setTimeout(() => {
+        closeFaceID();
+        
+        // If in login mode, proceed with login
+        if (mode === 'login') {
+            const phone = document.getElementById('login-phone').value;
+            if (phone) {
+                biometricLogin(phone, 'face');
+            }
+        }
+    }, 1500);
+}
+
+function closeFaceID() {
+    const modal = document.getElementById('faceid-modal');
+    modal.classList.remove('show');
+    
+    // Stop camera stream
+    if (faceIDStream) {
+        faceIDStream.getTracks().forEach(track => track.stop());
+        faceIDStream = null;
+    }
+    
+    // Clear interval
+    if (scanningInterval) {
+        clearInterval(scanningInterval);
+        scanningInterval = null;
+    }
+    
+    // Reset UI
+    document.querySelector('.progress-bar').style.width = '0%';
+    document.querySelector('.scanning-timer').textContent = '10s';
+    document.querySelector('.scanning-text').textContent = 'Position your face in the frame';
+    document.querySelector('.scanning-text').style.color = '';
+}
+
+// ==========================================
+// FINGERPRINT IMPLEMENTATION
+// ==========================================
+
+function checkFingerprint(mode) {
+    const modal = document.getElementById('fingerprint-modal');
+    const hint = document.getElementById('fingerprint-hint');
+    
+    modal.classList.add('show');
+    
+    // Check if device has fingerprint sensor using Web Authentication API
+    if (window.PublicKeyCredential && typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function') {
+        window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+            .then(available => {
+                if (available) {
+                    hint.textContent = 'Touch your fingerprint sensor now';
+                    startFingerprintAuth(mode);
+                } else {
+                    hint.textContent = 'No fingerprint sensor detected on this device';
+                    showToast('Fingerprint sensor not available', 'error');
+                    setTimeout(closeFingerprint, 3000);
+                }
+            })
+            .catch(err => {
+                console.error('Fingerprint check error:', err);
+                hint.textContent = 'Unable to detect fingerprint sensor';
+                showToast('Fingerprint detection failed', 'error');
+                setTimeout(closeFingerprint, 3000);
+            });
+    } else {
+        // Fallback for browsers without WebAuthn support
+        hint.textContent = 'Fingerprint not supported on this browser';
+        showToast('Your browser does not support fingerprint authentication', 'error');
+        setTimeout(closeFingerprint, 3000);
+    }
+}
+
+async function startFingerprintAuth(mode) {
+    try {
+        // Simulate fingerprint authentication process
+        // In a real app, this would use WebAuthn API
+        
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+        
+        const publicKeyCredentialRequestOptions = {
+            challenge: challenge,
+            allowCredentials: [],
+            userVerification: 'required',
+            timeout: 60000
+        };
+        
+        // Attempt to get credential (this will prompt for fingerprint)
+        const assertion = await navigator.credentials.get({
+            publicKey: publicKeyCredentialRequestOptions
+        }).catch(err => {
+            console.log('Fingerprint auth result:', err);
+            // For demo purposes, we'll simulate success after a delay
+            // In production, handle the actual error properly
+            return simulateFingerprintSuccess(mode);
+        });
+        
+        if (assertion) {
+            completeFingerprint(mode);
+        }
+        
+    } catch (error) {
+        console.error('Fingerprint error:', error);
+        document.getElementById('fingerprint-hint').textContent = 'Authentication failed';
+        showToast('Fingerprint authentication failed', 'error');
+        setTimeout(closeFingerprint, 2000);
+    }
+}
+
+function simulateFingerprintSuccess(mode) {
+    // Simulation for demo purposes
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve({ type: 'public-key' });
+        }, 2000);
+    });
+}
+
+function completeFingerprint(mode) {
+    const statusDiv = document.querySelector('.fingerprint-status');
+    const icon = document.querySelector('.fingerprint-icon i');
+    
+    statusDiv.textContent = 'Fingerprint recognized!';
+    icon.style.color = '#00c853';
+    
+    showToast('Fingerprint verified successfully', 'success');
+    
+    // Update button state
+    if (mode === 'setup') {
+        const btn = document.querySelector('.biometric-setup .fingerprint-btn');
+        btn.classList.add('success');
+        btn.innerHTML = '<i class="fas fa-check-circle"></i><span>Fingerprint Set</span>';
+    }
+    
+    setTimeout(() => {
+        closeFingerprint();
+        
+        // If in login mode, proceed with login
+        if (mode === 'login') {
+            const phone = document.getElementById('login-phone').value;
+            if (phone) {
+                biometricLogin(phone, 'fingerprint');
+            }
+        }
+    }, 1500);
+}
+
+function closeFingerprint() {
+    const modal = document.getElementById('fingerprint-modal');
+    modal.classList.remove('show');
+    
+    // Reset UI
+    document.querySelector('.fingerprint-status').textContent = 'Touch your fingerprint sensor';
+    document.querySelector('.fingerprint-icon i').style.color = '';
+    document.getElementById('fingerprint-hint').textContent = '';
+}
+
+// ==========================================
+// AUTHENTICATION HANDLERS
+// ==========================================
+
+function handleLogin(e) {
+    e.preventDefault();
+    
+    const phone = document.getElementById('login-phone').value;
+    const password = document.getElementById('login-password').value;
+    
+    const user = users.find(u => u.phone === phone && u.password === password);
+    
+    if (user) {
+        currentUser = user;
+        localStorage.setItem('zangi_current_user', JSON.stringify(user));
+        showToast('Login successful!', 'success');
+        showMainApp();
+    } else {
+        showToast('Invalid phone number or password', 'error');
+    }
+}
+
+function handleSignup(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('signup-name').value;
+    const phone = document.getElementById('signup-phone').value;
+    const password = document.getElementById('signup-password').value;
+    const avatarInput = document.getElementById('signup-avatar');
+    
+    // Check if user exists
+    if (users.find(u => u.phone === phone)) {
+        showToast('Phone number already registered', 'error');
+        return;
+    }
+    
+    // Process avatar
+    let avatar = 'https://via.placeholder.com/150/00c853/ffffff?text=' + name.charAt(0).toUpperCase();
+    
+    if (avatarInput.files && avatarInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            avatar = e.target.result;
+            completeSignup(name, phone, password, avatar);
+        };
+        reader.readAsDataURL(avatarInput.files[0]);
+    } else {
+        completeSignup(name, phone, password, avatar);
+    }
+}
+
+function completeSignup(name, phone, password, avatar) {
+    const newUser = {
+        id: Date.now().toString(),
+        name,
+        phone,
+        password,
+        avatar,
+        createdAt: new Date().toISOString(),
+        lastSeen: new Date().toISOString()
+    };
+    
+    users.push(newUser);
+    localStorage.setItem('zangi_users', JSON.stringify(users));
+    
+    currentUser = newUser;
+    localStorage.setItem('zangi_current_user', JSON.stringify(newUser));
+    
+    showToast('Account created successfully!', 'success');
+    showMainApp();
+}
+
+function biometricLogin(phone, method) {
+    // Find user by phone
+    const user = users.find(u => u.phone === phone);
+    
+    if (user) {
+        currentUser = user;
+        localStorage.setItem('zangi_current_user', JSON.stringify(user));
+        showToast(`${method === 'face' ? 'Face ID' : 'Fingerprint'} login successful!`, 'success');
+        showMainApp();
+    } else {
+        showToast('User not found. Please register first.', 'error');
+    }
+}
+
+function logout() {
+    currentUser = null;
+    currentChat = null;
+    localStorage.removeItem('zangi_current_user');
+    
+    document.getElementById('app-container').classList.add('hidden');
+    document.getElementById('auth-container').classList.remove('hidden');
+    
+    // Clear forms
+    document.getElementById('login-form-element').reset();
+    document.getElementById('signup-form-element').reset();
+    document.getElementById('avatar-preview').innerHTML = '';
+    document.getElementById('avatar-preview').classList.remove('show');
+    
+    showToast('Logged out successfully', 'info');
+}
+
+
+
+
+
+
+// ==========================================
+// MAIN APP INTERFACE
+// ==========================================
+
+function showMainApp() {
+    document.getElementById('auth-container').classList.add('hidden');
+    document.getElementById('app-container').classList.remove('hidden');
+    
+    // Update user info
+    document.getElementById('user-name').textContent = currentUser.name;
+    document.getElementById('user-phone').textContent = currentUser.phone;
+    document.getElementById('user-avatar').src = currentUser.avatar;
+    
+    // Load contacts
+    loadContacts();
+    
+    // Start simulated real-time updates
+    startRealTimeSimulation();
+}
+
+// ==========================================
+// CONTACTS MANAGEMENT
+// ==========================================
+
+function generateDummyUsers() {
+    // Generate some dummy users for demonstration if none exist
+    if (users.length === 0) {
+        const dummyUsers = [
+            { id: '1', name: 'Sarah Johnson', phone: '+1234567890', avatar: 'https://i.pravatar.cc/150?img=1', lastSeen: new Date().toISOString(), isOnline: true },
+            { id: '2', name: 'Michael Chen', phone: '+1234567891', avatar: 'https://i.pravatar.cc/150?img=2', lastSeen: new Date().toISOString(), isOnline: false },
+            { id: '3', name: 'Emma Williams', phone: '+1234567892', avatar: 'https://i.pravatar.cc/150?img=3', lastSeen: new Date().toISOString(), isOnline: true },
+            { id: '4', name: 'James Brown', phone: '+1234567893', avatar: 'https://i.pravatar.cc/150?img=4', lastSeen: new Date().toISOString(), isOnline: false },
+            { id: '5', name: 'Olivia Davis', phone: '+1234567894', avatar: 'https://i.pravatar.cc/150?img=5', lastSeen: new Date().toISOString(), isOnline: true }
+        ];
+        
+        users = [...users, ...dummyUsers];
+        localStorage.setItem('zangi_users', JSON.stringify(users));
+    }
+}
+
+function loadContacts() {
+    const contactsList = document.getElementById('contacts-list');
+    contactsList.innerHTML = '';
+    
+    // Filter out current user and sort by online status and last message
+    const otherUsers = users.filter(u => u.phone !== currentUser.phone);
+    
+    otherUsers.forEach(user => {
+        const contactItem = createContactElement(user);
+        contactsList.appendChild(contactItem);
+    });
+}
+
+function createContactElement(user) {
+    const div = document.createElement('div');
+    div.className = 'contact-item';
+    div.dataset.phone = user.phone;
+    div.onclick = () => selectContact(user);
+    
+    // Get last message
+    const chatKey = getChatKey(currentUser.phone, user.phone);
+    const chatMessages = messages[chatKey] || [];
+    const lastMessage = chatMessages[chatMessages.length - 1];
+    const unreadCount = chatMessages.filter(m => m.sender !== currentUser.phone && !m.read).length;
+    
+    const isOnline = user.isOnline || Math.random() > 0.5;
+    
+    div.innerHTML = `
+        <div class="contact-avatar">
+            <img src="${user.avatar}" alt="${user.name}">
+            ${isOnline ? '<div class="online-indicator"></div>' : ''}
+        </div>
+        <div class="contact-info">
+            <div class="contact-name">${user.name}</div>
+            <div class="contact-last-message">${lastMessage ? lastMessage.content : 'Tap to start chatting'}</div>
+        </div>
+        <div class="contact-meta">
+            <div class="contact-time">${lastMessage ? formatTime(lastMessage.timestamp) : ''}</div>
+            ${unreadCount > 0 ? `<div class="unread-badge">${unreadCount}</div>` : ''}
+        </div>
+    `;
+    
+    return div;
+}
+
+function selectContact(user) {
+    currentChat = user;
+    
+    // Update UI
+    document.querySelectorAll('.contact-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    document.querySelector(`[data-phone="${user.phone}"]`).classList.add('active');
+    
+    // Update chat header
+    document.getElementById('chat-avatar').src = user.avatar;
+    document.getElementById('chat-name').textContent = user.name;
+    document.getElementById('chat-status').textContent = user.isOnline ? 'Online' : 'Offline';
+    document.getElementById('chat-status').style.color = user.isOnline ? 'var(--online-color)' : 'var(--text-tertiary)';
+    
+    // Load messages
+    loadMessages(user);
+}
+
+function searchUsers() {
+    const searchTerm = document.getElementById('search-users').value.toLowerCase();
+    const contactItems = document.querySelectorAll('.contact-item');
+    
+    contactItems.forEach(item => {
+        const name = item.querySelector('.contact-name').textContent.toLowerCase();
+        const phone = item.dataset.phone;
+        
+        if (name.includes(searchTerm) || phone.includes(searchTerm)) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// ==========================================
+// MESSAGING SYSTEM
+// ==========================================
+
+function getChatKey(phone1, phone2) {
+    // Create consistent key for chat between two users
+    return [phone1, phone2].sort().join('_');
+}
+
+function loadMessages(user) {
+    const container = document.getElementById('messages-container');
+    container.innerHTML = '';
+    
+    const chatKey = getChatKey(currentUser.phone, user.phone);
+    const chatMessages = messages[chatKey] || [];
+    
+    if (chatMessages.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-comments"></i>
+                <p>No messages yet. Start the conversation!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    chatMessages.forEach(msg => {
+        const messageDiv = createMessageElement(msg);
+        container.appendChild(messageDiv);
+    });
+    
+    // Scroll to bottom
+    container.scrollTop = container.scrollHeight;
+    
+    // Mark messages as read
+    markMessagesAsRead(user.phone);
+}
+
+function createMessageElement(msg) {
+    const div = document.createElement('div');
+    const isMe = msg.sender === currentUser.phone;
+    
+    div.className = `message ${isMe ? 'sent' : 'received'}`;
+    
+    let content = '';
+    if (msg.type === 'image') {
+        content = `<img src="${msg.content}" class="message-image" alt="Image">`;
+    } else if (msg.type === 'file') {
+        content = `<div class="file-attachment"><i class="fas fa-file"></i> ${msg.filename}</div>`;
+    } else {
+        content = `<div class="message-content">${escapeHtml(msg.content)}</div>`;
+    }
+    
+    div.innerHTML = `
+        ${content}
+        <div class="message-time">
+            ${formatTime(msg.timestamp)}
+            ${isMe ? `<span class="message-status ${msg.status}"><i class="fas fa-check${msg.status === 'read' ? '-double' : ''}"></i></span>` : ''}
+        </div>
+    `;
+    
+    return div;
+}
+
+function sendMessage() {
+    const input = document.getElementById('message-input');
+    const content = input.value.trim();
+    
+    if (!content || !currentChat) return;
+    
+    const message = {
+        id: Date.now().toString(),
+        sender: currentUser.phone,
+        receiver: currentChat.phone,
+        content: content,
+        type: 'text',
+        timestamp: new Date().toISOString(),
+        status: 'sent'
+    };
+    
+    saveMessage(message);
+    input.value = '';
+    
+    // Simulate message status updates
+    setTimeout(() => updateMessageStatus(message.id, 'delivered'), 1000);
+    setTimeout(() => updateMessageStatus(message.id, 'read'), 3000);
+    
+    // Simulate reply after random delay (for demo purposes)
+    if (Math.random() > 0.3) {
+        setTimeout(() => simulateReply(), 2000 + Math.random() * 3000);
+    }
+}
+
+function saveMessage(message) {
+    const chatKey = getChatKey(message.sender, message.receiver);
+    
+    if (!messages[chatKey]) {
+        messages[chatKey] = [];
+    }
+    
+    messages[chatKey].push(message);
+    localStorage.setItem('zangi_messages', JSON.stringify(messages));
+    
+    // Reload messages if this is the current chat
+    if (currentChat && (currentChat.phone === message.sender || currentChat.phone === message.receiver)) {
+        loadMessages(currentChat);
+    }
+    
+    // Update contact list preview
+    loadContacts();
+}
+
+function updateMessageStatus(messageId, status) {
+    // Find and update message status
+    for (let key in messages) {
+        const msg = messages[key].find(m => m.id === messageId);
+        if (msg) {
+            msg.status = status;
+            localStorage.setItem('zangi_messages', JSON.stringify(messages));
+            
+            if (currentChat) {
+                loadMessages(currentChat);
+            }
+            break;
+        }
+    }
+}
+
+function simulateReply() {
+    if (!currentChat) return;
+    
+    const replies = [
+        'Hey! How are you?',
+        'That sounds great!',
+        'I\'ll get back to you soon.',
+        'Can we talk later?',
+        'Thanks for letting me know!',
+        'LOL 😄',
+        'That\'s interesting!',
+        'I agree with you.',
+        'What do you think about this?',
+        'See you tomorrow!'
+    ];
+    
+    const reply = {
+        id: Date.now().toString(),
+        sender: currentChat.phone,
+        receiver: currentUser.phone,
+        content: replies[Math.floor(Math.random() * replies.length)],
+        type: 'text',
+        timestamp: new Date().toISOString(),
+        status: 'delivered'
+    };
+    
+    saveMessage(reply);
+    
+    // Show notification if not currently viewing this chat
+    if (document.hidden || currentChat.phone !== reply.sender) {
+        showToast(`New message from ${currentChat.name}`, 'info');
+    }
+}
+
+function markMessagesAsRead(senderPhone) {
+    const chatKey = getChatKey(currentUser.phone, senderPhone);
+    
+    if (messages[chatKey]) {
+        messages[chatKey].forEach(msg => {
+            if (msg.sender === senderPhone && msg.status !== 'read') {
+                msg.status = 'read';
+            }
+        });
+        localStorage.setItem('zangi_messages', JSON.stringify(messages));
+        loadContacts();
+    }
+}
+
+function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+        sendMessage();
+    }
+}
+
+// ==========================================
+// FILE SHARING
+// ==========================================
+
+function showAttachmentMenu() {
+    const menu = document.getElementById('attachment-menu');
+    menu.classList.toggle('hidden');
+}
+
+function selectImage() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => handleFileSelect(e, 'image');
+    input.click();
+    
+    document.getElementById('attachment-menu').classList.add('hidden');
+}
+
+function selectFile() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = (e) => handleFileSelect(e, 'file');
+    input.click();
+    
+    document.getElementById('attachment-menu').classList.add('hidden');
+}
+
+function selectCamera() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showToast('Camera not available', 'error');
+        return;
+    }
+    
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            // Create camera UI
+            const video = document.createElement('video');
+            video.srcObject = stream;
+            video.play();
+            
+            // In a real app, you'd show a camera interface
+            showToast('Camera opened (simulation)', 'info');
+            
+            // Stop stream after capture simulation
+            setTimeout(() => {
+                stream.getTracks().forEach(track => track.stop());
+            }, 1000);
+        })
+        .catch(err => {
+            showToast('Camera access denied', 'error');
+        });
+    
+    document.getElementById('attachment-menu').classList.add('hidden');
+}
+
+function selectLocation() {
+    if (!navigator.geolocation) {
+        showToast('Geolocation not supported', 'error');
+        return;
+    }
+    
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const locationUrl = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`;
+            document.getElementById('message-input').value = `My location: ${locationUrl}`;
+            showToast('Location added to message', 'success');
+        },
+        (error) => {
+            showToast('Unable to get location', 'error');
+        }
+    );
+    
+    document.getElementById('attachment-menu').classList.add('hidden');
+}
+
+function handleFileSelect(event, type) {
+    const file = event.target.files[0];
+    if (!file || !currentChat) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const message = {
+            id: Date.now().toString(),
+            sender: currentUser.phone,
+            receiver: currentChat.phone,
+            content: e.target.result,
+            type: type,
+            filename: file.name,
+            timestamp: new Date().toISOString(),
+            status: 'sent'
+        };
+        
+        saveMessage(message);
+        
+        setTimeout(() => updateMessageStatus(message.id, 'delivered'), 1000);
+        setTimeout(() => updateMessageStatus(message.id, 'read'), 3000);
+    };
+    
+    if (type === 'image') {
+        reader.readAsDataURL(file);
+    } else {
+        reader.readAsText(file);
+    }
+}
+
+
+
+
+
+
+// ==========================================
+// STATUS FEATURES
+// ==========================================
+
+function showStatusModal() {
+    document.getElementById('status-modal').classList.add('show');
+}
+
+function closeStatusModal() {
+    document.getElementById('status-modal').classList.remove('show');
+    document.getElementById('status-text').value = '';
+    document.getElementById('status-preview').innerHTML = '';
+    document.getElementById('status-media-input').value = '';
+}
+
+function previewStatusMedia(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const preview = document.getElementById('status-preview');
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+        if (file.type.startsWith('image/')) {
+            preview.innerHTML = `<img src="${e.target.result}" alt="Status preview">`;
+        } else if (file.type.startsWith('video/')) {
+            preview.innerHTML = `<video src="${e.target.result}" controls></video>`;
+        }
+    };
+    
+    reader.readAsDataURL(file);
+}
+
+function postStatus() {
+    const text = document.getElementById('status-text').value.trim();
+    const mediaInput = document.getElementById('status-media-input');
+    
+    if (!text && !mediaInput.files[0]) {
+        showToast('Please add text or media to your status', 'error');
+        return;
+    }
+    
+    const status = {
+        id: Date.now().toString(),
+        userId: currentUser.id,
+        userName: currentUser.name,
+        userAvatar: currentUser.avatar,
+        text: text,
+        timestamp: new Date().toISOString(),
+        views: []
+    };
+    
+    // Handle media
+    if (mediaInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            status.media = e.target.result;
+            status.mediaType = mediaInput.files[0].type.startsWith('image/') ? 'image' : 'video';
+            saveStatus(status);
+        };
+        reader.readAsDataURL(mediaInput.files[0]);
+    } else {
+        saveStatus(status);
+    }
+}
+
+function saveStatus(status) {
+    statuses.unshift(status);
+    localStorage.setItem('zangi_statuses', JSON.stringify(statuses));
+    
+    closeStatusModal();
+    showToast('Status posted!', 'success');
+    
+    // If currently on status tab, refresh
+    const statusTab = document.querySelector('.tab-btn:nth-child(2)');
+    if (statusTab.classList.contains('active')) {
+        loadStatuses();
+    }
+}
+
+function loadStatuses() {
+    const container = document.getElementById('contacts-list');
+    container.innerHTML = '';
+    
+    // Filter statuses from other users
+    const otherStatuses = statuses.filter(s => s.userId !== currentUser.id);
+    
+    if (otherStatuses.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state" style="padding: 40px;">
+                <i class="fas fa-circle-notch"></i>
+                <p>No statuses yet. Be the first to post!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    otherStatuses.forEach(status => {
+        const statusDiv = document.createElement('div');
+        statusDiv.className = 'status-item';
+        
+        const timeAgo = getTimeAgo(status.timestamp);
+        
+        let mediaHtml = '';
+        if (status.media) {
+            if (status.mediaType === 'image') {
+                mediaHtml = `<div class="status-media-content"><img src="${status.media}" alt="Status"></div>`;
+            } else {
+                mediaHtml = `<div class="status-media-content"><video src="${status.media}" controls></video></div>`;
+            }
+        }
+        
+        statusDiv.innerHTML = `
+            <div class="status-header">
+                <img src="${status.userAvatar}" alt="${status.userName}">
+                <div class="status-header-info">
+                    <h4>${status.userName}</h4>
+                    <span>${timeAgo}</span>
+                </div>
+            </div>
+            ${status.text ? `<div class="status-text">${escapeHtml(status.text)}</div>` : ''}
+            ${mediaHtml}
+        `;
+        
+        container.appendChild(statusDiv);
+    });
+}
+
+// ==========================================
+// CALLING FEATURES
+// ==========================================
+
+let currentCall = null;
+let localStream = null;
+let remoteStream = null;
+
+function startVoiceCall() {
+    if (!currentChat) {
+        showToast('Select a contact first', 'error');
+        return;
+    }
+    
+    initiateCall('voice');
+}
+
+function startVideoCall() {
+    if (!currentChat) {
+        showToast('Select a contact first', 'error');
+        return;
+    }
+    
+    initiateCall('video');
+}
+
+async function initiateCall(type) {
+    const modal = document.getElementById('call-modal');
+    document.getElementById('call-avatar').src = currentChat.avatar;
+    document.getElementById('call-name').textContent = currentChat.name;
+    document.getElementById('call-status').textContent = type === 'video' ? 'Video calling...' : 'Calling...';
+    
+    modal.classList.add('show');
+    
+    currentCall = {
+        type: type,
+        with: currentChat,
+        startTime: Date.now(),
+        status: 'calling'
+    };
+    
+    // Simulate call connection
+    setTimeout(() => {
+        if (currentCall && currentCall.status === 'calling') {
+            document.getElementById('call-status').textContent = 'Ringing...';
+        }
+    }, 2000);
+    
+    // Auto-accept for demo (simulate other user answering)
+    setTimeout(() => {
+        if (currentCall && currentCall.status === 'calling') {
+            acceptCallSimulation();
+        }
+    }, 4000);
+}
+
+function acceptCallSimulation() {
+    if (!currentCall) return;
+    
+    currentCall.status = 'connected';
+    document.getElementById('call-status').textContent = 'Connected';
+    
+    // Show call controls
+    showToast(`${currentCall.type === 'video' ? 'Video' : 'Voice'} call connected`, 'success');
+    
+    // Start call timer
+    let seconds = 0;
+    callTimer = setInterval(() => {
+        seconds++;
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        document.getElementById('call-status').textContent = 
+            `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }, 1000);
+    
+    // For video calls, try to get camera
+    if (currentCall.type === 'video') {
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then(stream => {
+                localStream = stream;
+                showToast('Camera active', 'info');
+            })
+            .catch(err => {
+                showToast('Camera not available, audio only', 'warning');
+            });
+    }
+}
+
+function acceptCall() {
+    acceptCallSimulation();
+}
+
+function endCall() {
+    const modal = document.getElementById('call-modal');
+    modal.classList.remove('show');
+    
+    // Stop timer
+    if (callTimer) {
+        clearInterval(callTimer);
+        callTimer = null;
+    }
+    
+    // Stop streams
+    if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+    }
+    
+    if (currentCall) {
+        const duration = Math.floor((Date.now() - currentCall.startTime) / 1000);
+        if (duration > 0) {
+            showToast(`Call ended (${formatDuration(duration)})`, 'info');
+            
+            // Save call log
+            saveCallLog(currentCall.with, currentCall.type, duration);
+        }
+    }
+    
+    currentCall = null;
+}
+
+function saveCallLog(contact, type, duration) {
+    const callLogs = JSON.parse(localStorage.getItem('zangi_calls') || '[]');
+    callLogs.unshift({
+        contact: contact,
+        type: type,
+        duration: duration,
+        timestamp: new Date().toISOString(),
+        isOutgoing: true
+    });
+    localStorage.setItem('zangi_calls', JSON.stringify(callLogs));
+}
+
+function loadCallLogs() {
+    const container = document.getElementById('contacts-list');
+    const callLogs = JSON.parse(localStorage.getItem('zangi_calls') || '[]');
+    
+    container.innerHTML = '';
+    
+    if (callLogs.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state" style="padding: 40px;">
+                <i class="fas fa-phone"></i>
+                <p>No recent calls</p>
+            </div>
+        `;
+        return;
+    }
+    
+    callLogs.forEach(log => {
+        const callDiv = document.createElement('div');
+        callDiv.className = 'contact-item';
+        
+        const timeAgo = getTimeAgo(log.timestamp);
+        const icon = log.type === 'video' ? 'fa-video' : 'fa-phone';
+        const color = log.isOutgoing ? 'var(--primary-color)' : 'var(--secondary-color)';
+        
+        callDiv.innerHTML = `
+            <div class="contact-avatar">
+                <img src="${log.contact.avatar}" alt="${log.contact.name}">
+            </div>
+            <div class="contact-info">
+                <div class="contact-name">${log.contact.name}</div>
+                <div class="contact-last-message">
+                    <i class="fas ${icon}" style="color: ${color}; margin-right: 5px;"></i>
+                    ${log.isOutgoing ? 'Outgoing' : 'Incoming'} ${log.type} call • ${formatDuration(log.duration)}
+                </div>
+            </div>
+            <div class="contact-meta">
+                <div class="contact-time">${timeAgo}</div>
+            </div>
+        `;
+        
+        container.appendChild(callDiv);
+    });
+}
+
+// ==========================================
+// TAB SWITCHING
+// ==========================================
+
+function switchTab(tabName) {
+    // Update tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.closest('.tab-btn').classList.add('active');
+    
+    // Load appropriate content
+    switch(tabName) {
+        case 'chats':
+            loadContacts();
+            break;
+        case 'status':
+            loadStatuses();
+            break;
+        case 'calls':
+            loadCallLogs();
+            break;
+    }
+}
+
+// ==========================================
+// REAL-TIME SIMULATION
+// ==========================================
+
+function startRealTimeSimulation() {
+    // Simulate incoming messages
+    setInterval(() => {
+        if (currentChat && Math.random() > 0.7) {
+            simulateReply();
+        }
+    }, 15000);
+    
+    // Simulate status updates
+    setInterval(() => {
+        if (Math.random() > 0.8) {
+            simulateStatusUpdate();
+        }
+    }, 30000);
+    
+    // Update online statuses
+    setInterval(() => {
+        updateOnlineStatuses();
+    }, 10000);
+}
+
+function simulateStatusUpdate() {
+    const demoUsers = users.filter(u => u.phone !== currentUser.phone);
+    if (demoUsers.length === 0) return;
+    
+    const randomUser = demoUsers[Math.floor(Math.random() * demoUsers.length)];
+    const sampleStatuses = [
+        'Having a great day! ☀️',
+        'Busy at work 💼',
+        'Can\'t wait for the weekend! 🎉',
+        'Just finished a workout 💪',
+        'Listening to music 🎵',
+        'Traveling ✈️',
+        'Good vibes only ✨'
+    ];
+    
+    const status = {
+        id: Date.now().toString(),
+        userId: randomUser.id,
+        userName: randomUser.name,
+        userAvatar: randomUser.avatar,
+        text: sampleStatuses[Math.floor(Math.random() * sampleStatuses.length)],
+        timestamp: new Date().toISOString(),
+        views: []
+    };
+    
+    statuses.unshift(status);
+    localStorage.setItem('zangi_statuses', JSON.stringify(statuses));
+    
+    // Show notification if on status tab
+    const statusTab = document.querySelector('.tab-btn:nth-child(2)');
+    if (statusTab.classList.contains('active')) {
+        loadStatuses();
+    }
+}
+
+function updateOnlineStatuses() {
+    users.forEach(user => {
+        if (user.phone !== currentUser.phone) {
+            user.isOnline = Math.random() > 0.4;
+            user.lastSeen = new Date().toISOString();
+        }
+    });
+    localStorage.setItem('zangi_users', JSON.stringify(users));
+    
+    // Refresh UI if on chats tab
+    const chatsTab = document.querySelector('.tab-btn:first-child');
+    if (chatsTab.classList.contains('active')) {
+        loadContacts();
+    }
+}
+
+// ==========================================
+// UTILITY FUNCTIONS
+// ==========================================
+
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    const icon = type === 'success' ? 'fa-check-circle' : 
+                 type === 'error' ? 'fa-exclamation-circle' : 
+                 type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+    
+    toast.innerHTML = `
+        <i class="fas ${icon}"></i>
+        <span>${message}</span>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+function formatTime(timestamp) {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatDuration(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+function getTimeAgo(timestamp) {
+    const seconds = Math.floor((new Date() - new Date(timestamp)) / 1000);
+    
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + ' years ago';
+    
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + ' months ago';
+    
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + ' days ago';
+    
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + ' hours ago';
+    
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + ' minutes ago';
+    
+    return 'Just now';
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function showChatMenu() {
+    // Simple chat menu - could be expanded
+    const options = ['View Contact', 'Media, links, and docs', 'Search', 'Mute notifications', 'Clear chat', 'Delete chat'];
+    
+    // Create simple menu
+    showToast('Chat menu: ' + options.join(', '), 'info');
+}
+
+function showEmojiPicker() {
+    // Simple emoji picker simulation
+    const emojis = ['😀', '😂', '😍', '🤔', '👍', '👎', '❤️', '🎉', '🔥', '👋'];
+    const input = document.getElementById('message-input');
+    
+    // Add random emoji
+    input.value += emojis[Math.floor(Math.random() * emojis.length)];
+    input.focus();
+}
+
+// ==========================================
+// NETWORK STATUS MONITORING
+// ==========================================
+
+window.addEventListener('online', () => {
+    showToast('Back online', 'success');
+});
+
+window.addEventListener('offline', () => {
+    showToast('You are offline. Messages will be sent when connection is restored.', 'warning');
+});
+
+// Check initial status
+if (!navigator.onLine) {
+    showToast('You are currently offline', 'warning');
+}
+
+// ==========================================
+// SERVICE WORKER REGISTRATION (for PWA features)
+// ==========================================
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        // In a real deployment, register service worker
+        // navigator.serviceWorker.register('/sw.js');
+    });
+}
+
+console.log('Zangi Messenger loaded successfully!');
+console.log('Features: Secure messaging, Face ID, Fingerprint, Voice/Video calls, Status updates');
+
+    </script>
+</body>
+</html>
